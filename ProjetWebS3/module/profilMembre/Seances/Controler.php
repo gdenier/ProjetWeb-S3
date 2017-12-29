@@ -22,30 +22,39 @@ class Controler
     }
 
     function launch(){
-        if(!isset($_GET['seance'])){
-            if(isset($_POST['submit'])){
-                if($this->modele->rentrer_stat()){
-                    //$this->modele->suppSeance();
-                }
-            }
-            $liste = $this->modele->listSeance();
-            $this->vue->affichePage('list_seance', $liste);
+
+        if(!isset($_GET['seance']) && !isset($_GET['seanceStat'])){
+            $this->vue->affichePage('choix');
         }else{
-            if(isset($_GET['submit'])){
-                $liste = $this->modele->listExercice();
-                $this->vue->affichePage('Submit_seance', $liste);
-            }elseif(isset($_POST['submit'])){
-                $this->modele->rentrer_stat();
-                //$this->modele->suppSeance();
-                $liste = $this->modele->listSeance();
-                $this->vue->affichePage('list_seance', $liste);
+            if(isset($_GET['seance'])){
+                if($_GET['seance'] == 'null'){
+                    $liste = $this->modele->listSeance();
+                    $this->vue->affichePage('list_seance', $liste);
+                }elseif(isset($_GET['submit'])){
+                    $liste = $this->modele->listExercice();
+                    $this->vue->affichePage('Submit_seance', $liste);
+                }elseif(isset($_POST['submit'])){
+                    $this->modele->rentrer_stat();
+                    $this->modele->suppSeance();
+                    $liste = $this->modele->listSeance();
+                    $this->vue->affichePage('list_seance', $liste);
+
+                }else{
+                    $liste = $this->modele->listExercice();
+                    $this->vue->affichePage('list_exercice', $liste);
+                }
 
             }else{
-                $liste = $this->modele->listExercice();
-                $this->vue->affichePage('list_exercice', $liste);
+
+                if($_GET['seanceStat'] == 'null'){
+                    $liste = $this->modele->listSeanceStat();
+                    $this->vue->affichePage('list_seance_stat', $liste);
+                }else{
+                    $liste = $this->modele->listExerciceStat();
+                    $this->vue->affichePage('list_exercice_stat', $liste);
+                }
+
             }
-
-
         }
     }
 

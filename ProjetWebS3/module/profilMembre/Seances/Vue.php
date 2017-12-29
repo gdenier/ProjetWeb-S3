@@ -14,12 +14,18 @@ class Vue
 
     function affichePage($type, $contenu = null){
         $this->afficherMenu();
-        if($type == 'list_seance'){
+        if($type == 'choix'){
+            $this->afficheChoix();
+        }elseif($type == 'list_seance'){
             $this->afficheListSeance($contenu);
         }elseif ($type == 'list_exercice'){
             $this->afficheListExercice($contenu);
         }elseif($type == 'Submit_seance'){
             $this->RentrerSeance($contenu);
+        }elseif($type == 'list_seance_stat'){
+            $this->afficheListSeanceStat($contenu);
+        }elseif($type == 'list_exercice_stat'){
+            $this->afficheListExerciceStat($contenu);
         }
         include_once ("src/html/page.html");
     }
@@ -36,6 +42,13 @@ class Vue
                     <li><a href="https://livesport.onl?module=logout">Deconnexion</a></li>
                 </ul>
             </nav>
+        ';
+    }
+
+    function afficheChoix(){
+        $this->contenu .= '
+            <a href="index.php?module=seance&seance=null">Seance a venir</a>
+            <a href="index.php?module=seance&seanceStat=null">Seance passé</a>
         ';
     }
 
@@ -78,6 +91,8 @@ class Vue
                 ';
             }
 
+            
+
             $this->contenu .= '
                 </table>
             ';
@@ -96,6 +111,7 @@ class Vue
         $j = 0;
         foreach ($contenu as $record){
 
+
             $charge = explode("-", $record['charge']);
             $rep = explode("-", $record['repetitions']);
             $repos = explode("-", $record['temps_repos']);
@@ -104,7 +120,6 @@ class Vue
 
             $this->contenu .= '
                 <h4>'. $record['nom_exercice'] .'</h4>
-                <input type="hidden" name="nom" value="'.$record['nom_exercice'].'">
                 <table>
                     <tr>
                         <td>Série</td>
@@ -143,6 +158,53 @@ class Vue
             </form>
         ';
 
+    }
+
+    function afficheSeanceStat($contenu){
+        foreach ($contenu as $record) {
+            $this->contenu .= '
+                <h4><a href="https://livesport.onl?module=seance&seanceStat='. $record['id_seance_stat'] .'">'. $record['nom_seance_stat'] .'</a></h4>
+            ';
+        }
+    }
+
+    function afficheExoStat($contenu){
+        foreach ($contenu as $record){
+
+            $charge = explode("-", $record['charge']);
+            $rep = explode("-", $record['repetitions']);
+            $repos = explode("-", $record['temps_repos']);
+
+            $nb = count($charge);
+
+            $this->contenu .= '
+                <h4>'. $record['nom_exercice_stat'] .'</h4>
+                <table>
+                    <tr>
+                        <td>Série</td>
+                        <td>charge</td>
+                        <td>Répétition</td>
+                        <td>Repos</td>
+                    </tr>
+                ';
+
+            for ($i=0; $i < $nb; $i++) {
+                $this->contenu .= '
+                    <tr>
+                        <td>'.($i+1).'</td>
+                        <td>'.$charge[$i].'</td>
+                        <td>'.$rep[$i].'</td>
+                        <td>'.$repos[$i].'</td>
+                    </tr>
+                ';
+            }
+
+            
+
+            $this->contenu .= '
+                </table>
+            ';
+        }
     }
     
 }

@@ -41,6 +41,22 @@ class Modele extends Parametre_connexion
         return $requete->fetchAll(PDO::FETCH_ASSOC);
     }
 
+    function listSeanceStat(){
+        $sql = 'SELECT * FROM Seance_stat INNER JOIN Client ON Seance_stat.pseudo_client = Client.pseudo_client WHERE Client.pseudo_client = ?';
+        $requete = $this->bdd->prepare($sql);
+        $pseudo = $_SESSION['pseudo'];
+        $requete->execute(array($pseudo));
+        return $requete->fetchAll(PDO::FETCH_ASSOC);
+    }
+
+    function listExerciceStat(){
+        $sql = 'SELECT nom_exercice_stat, charge, temps_repos, tempo, repetitions FROM Seance_stat INNER JOIN Exercice_stat ON Seance_stat.id_seance_stat = Exercice_stat.id_seance_stat WHERE Seance_stat.id_seance_stat = ?';
+        $requete = $this->bdd->prepare($sql);
+        $id = $_GET['seance'];
+        $requete->execute(array($id));
+        return $requete->fetchAll(PDO::FETCH_ASSOC);
+    }
+
     function rentrer_stat(){
 
         try{
@@ -58,7 +74,7 @@ class Modele extends Parametre_connexion
     function CreerSeanceStat(){
         $sql = 'INSERT INTO Seance_stat (id_seance_stat, nom_seance_stat, commentaire_perso, pseudo_client) VALUES (?,?,?,?)';
         $requete = $this->bdd->prepare($sql);
-        $nom = $_POST['nom_seance'];
+        $nom = "Seance du " . date("d.m.y");
         $com = $_POST['commentaire'];
         $pseudo = $_SESSION['pseudo'];
         $id = $_GET['seance'];
@@ -71,7 +87,6 @@ class Modele extends Parametre_connexion
         $requete->execute(array($_GET['seance']));
 
         $nb = $requete->fetch(PDO::FETCH_ASSOC);
-        echo $nb['nbExo'];
         for($j = 0; $j<$nb['nbExo']; $j++){
             $sql = 'INSERT INTO Exercice_stat (nom_exercice_stat, charge, temps_repos, repetition, id_seance_stat) VALUES (?,?,?,?,?)';
             $requete = $this->bdd->prepare($sql);
@@ -107,14 +122,18 @@ class Modele extends Parametre_connexion
                 $rep,
                 $_GET['seance']
             ));
-            echo "charge: ".$charge."; rep: ".$rep."; temps: ".$repos;
         }
     }
 
     function suppSeance(){
+
+        $sql = 'DELETE FROM Exercice WHERE id_seance = ?';
+        $requete = $this->bdd->prepare($sql);
+        $id = $_GET['seance'];
+        $requete->execute(array($id));
+
         $sql = 'DELETE FROM Seance WHERE id_seance = ?';
         $requete = $this->bdd->prepare($sql);
-        $id = $_GET['id'];
         $requete->execute(array($id));
     }
 }
